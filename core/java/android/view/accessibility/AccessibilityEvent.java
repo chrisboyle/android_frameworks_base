@@ -126,9 +126,19 @@ import java.util.List;
  * <p>
  * <b>NOTIFICATION TYPES</b> <br>
  * <p>
- * <b>Notification state changed</b> - represents the event showing/hiding
+ * <b>Notification state changed</b> - represents the event of showing/updating a
  * {@link android.app.Notification}.
  * Type: {@link #TYPE_NOTIFICATION_STATE_CHANGED} <br>
+ * Properties:
+ * {@link #getClassName()},
+ * {@link #getPackageName()},
+ * {@link #getEventTime()},
+ * {@link #getText()}
+ * {@link #getParcelableData()}
+ * <p>
+ * <b>Notification removed</b> - represents the event of removing a
+ * {@link android.app.Notification}.
+ * Type: {@link #TYPE_NOTIFICATION_REMOVED} <br>
  * Properties:
  * {@link #getClassName()},
  * {@link #getPackageName()},
@@ -197,9 +207,14 @@ public final class AccessibilityEvent implements Parcelable {
     public static final int TYPE_WINDOW_STATE_CHANGED = 0x00000020;
 
     /**
-     * Represents the event showing/hiding a {@link android.app.Notification}.
+     * Represents the event of showing/updating a {@link android.app.Notification}.
      */
     public static final int TYPE_NOTIFICATION_STATE_CHANGED = 0x00000040;
+
+    /**
+     * Represents the event of hiding a {@link android.app.Notification}.
+     */
+    public static final int TYPE_NOTIFICATION_REMOVED = 0x00000080;
 
     /**
      * Mask for {@link AccessibilityEvent} all types.
@@ -211,6 +226,7 @@ public final class AccessibilityEvent implements Parcelable {
      * @see #TYPE_VIEW_TEXT_CHANGED
      * @see #TYPE_WINDOW_STATE_CHANGED
      * @see #TYPE_NOTIFICATION_STATE_CHANGED
+     * @see #TYPE_NOTIFICATION_REMOVED
      */
     public static final int TYPES_ALL_MASK = 0xFFFFFFFF;
 

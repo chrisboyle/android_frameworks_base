@@ -88,6 +88,8 @@ public class StatusBarManagerService extends IStatusBarService.Stub
         void onPanelRevealed();
         void onNotificationError(String pkg, String tag, int id,
                 int uid, int initialPid, String message);
+        void onNotificationText(String pkg, String tag, int id,
+                List<CharSequence> text);
     }
 
     /**
@@ -312,6 +314,13 @@ public class StatusBarManagerService extends IStatusBarService.Stub
         enforceStatusBarService();
 
         mNotificationCallbacks.onClearAll();
+    }
+
+    public void onNotificationText(String pkg, String tag, int id,
+            List text) {
+        enforceStatusBarService();
+
+        mNotificationCallbacks.onNotificationText(pkg, tag, id, (List<CharSequence>)text);
     }
 
     // ================================================================================

@@ -661,6 +661,10 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
                     handleNotificationError(key, notification, "Couldn't update icon: " + ic);
                     return;
                 }
+                try {
+                    mBarService.onNotificationText(notification.pkg, notification.tag,
+                            notification.id, dumpTextViews(oldEntry.content));
+                } catch (RemoteException ex) {}
             }
             catch (RuntimeException e) {
                 // It failed to add cleanly.  Log, and remove the view from the panel.
@@ -757,6 +761,10 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
             content.addView(expanded);
             row.setDrawingCacheEnabled(true);
         }
+        try {
+            mBarService.onNotificationText(notification.pkg, notification.tag,
+                    notification.id, dumpTextViews(expanded));
+        } catch (RemoteException ex) {}
 
         return new View[] { row, content, expanded };
     }
@@ -1898,4 +1906,17 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
             vibrate();
         }
     };
+
+   ArrayList<CharSequence> dumpTextViews(View tree) {
+      ArrayList<CharSequence> a = new ArrayList<CharSequence>();
+      if (tree instanceof TextView) {
+         a.add(((TextView)tree).getText());
+      } else if (tree instanceof ViewGroup) {
+         ViewGroup vg = (ViewGroup)tree;
+         for (int i=0; i<vg.getChildCount(); i++) {
+            a.addAll(dumpTextViews(vg.getChildAt(i)));
+         }
+      }  // else no text here
+      return a;
+   }
 }

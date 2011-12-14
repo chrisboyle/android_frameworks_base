@@ -41,4 +41,6 @@ interface IStatusBarService
     void onNotificationError(String pkg, String tag, int id,
             int uid, int initialPid, String message);
     void onClearAllNotifications();
+    void onNotificationText(String pkg, String tag, int id,
+            in List text);
 }

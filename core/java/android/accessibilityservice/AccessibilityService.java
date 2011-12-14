@@ -80,6 +80,7 @@ import android.view.accessibility.AccessibilityEvent;
  * {@link AccessibilityEvent#TYPE_VIEW_TEXT_CHANGED}
  * {@link AccessibilityEvent#TYPE_WINDOW_STATE_CHANGED}
  * {@link AccessibilityEvent#TYPE_NOTIFICATION_STATE_CHANGED}
+ * {@link AccessibilityEvent#TYPE_NOTIFICATION_REMOVED}
  *  <p>
  *  <b>Feedback types</b>
  *  <p>

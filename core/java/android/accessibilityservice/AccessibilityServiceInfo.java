@@ -72,6 +72,7 @@ public class AccessibilityServiceInfo implements Parcelable {
      * @see android.view.accessibility.AccessibilityEvent#TYPE_VIEW_TEXT_CHANGED
      * @see android.view.accessibility.AccessibilityEvent#TYPE_WINDOW_STATE_CHANGED
      * @see android.view.accessibility.AccessibilityEvent#TYPE_NOTIFICATION_STATE_CHANGED
+     * @see android.view.accessibility.AccessibilityEvent#TYPE_NOTIFICATION_REMOVED
      */
     public int eventTypes;
 

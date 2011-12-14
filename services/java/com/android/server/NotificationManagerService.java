@@ -76,6 +76,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -245,6 +246,7 @@ public class NotificationManagerService extends INotificationManager.Stub
         int duration;
         final Notification notification;
         IBinder statusBarKey;
+        List<CharSequence> text;
 
         NotificationRecord(String pkg, String tag, int id, int uid, int initialPid,
                 Notification notification)
@@ -418,6 +420,18 @@ public class NotificationManagerService extends INotificationManager.Stub
             } catch (RemoteException e) {
             }
             Binder.restoreCallingIdentity(ident);
+        }
+
+        public void onNotificationText(String pkg, String tag, int id,
+                List<CharSequence> text) {
+            synchronized (mNotificationList) {
+                int index = indexOfNotificationLocked(pkg, tag, id);
+                if (index >= 0) {
+                    NotificationRecord r = mNotificationList.get(index);
+                    r.text = text;
+                    sendAccessibilityEvent(r.notification, pkg, false, r.text);
+                }
+            }
         }
     };
 
@@ -1111,7 +1125,9 @@ public class NotificationManagerService extends INotificationManager.Stub
                         Binder.restoreCallingIdentity(identity);
                     }
                 }
-                sendAccessibilityEvent(notification, pkg);
+                // We no longer send the accessibility event here: wait for
+                // onNotificationText() to come back when contentView has
+                // been inflated
             } else {
                 if (old != null && old.statusBarKey != null) {
                     long identity = Binder.clearCallingIdentity();
@@ -1289,20 +1305,25 @@ public class NotificationManagerService extends INotificationManager.Stub
         return true;
     }
 
-    private void sendAccessibilityEvent(Notification notification, CharSequence packageName) {
+    private void sendAccessibilityEvent(Notification notification, CharSequence packageName,
+            boolean removing, List<CharSequence> expandedText) {
         AccessibilityManager manager = AccessibilityManager.getInstance(mContext);
         if (!manager.isEnabled()) {
             return;
         }
 
-        AccessibilityEvent event =
-            AccessibilityEvent.obtain(AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED);
+        AccessibilityEvent event = AccessibilityEvent.obtain(removing
+            ? AccessibilityEvent.TYPE_NOTIFICATION_REMOVED
+            : AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED);
         event.setPackageName(packageName);
         event.setClassName(Notification.class.getName());
         event.setParcelableData(notification);
         CharSequence tickerText = notification.tickerText;
         if (!TextUtils.isEmpty(tickerText)) {
             event.getText().add(tickerText);
+        }
+        if (expandedText != null) {
+            event.getText().addAll(expandedText);
         }
 
         manager.sendAccessibilityEvent(event);
@@ -1319,6 +1340,8 @@ public class NotificationManagerService extends INotificationManager.Stub
                 Binder.restoreCallingIdentity(identity);
             }
             r.statusBarKey = null;
+
+            sendAccessibilityEvent(r.notification, r.pkg, true, r.text);
         }
 
         // sound
